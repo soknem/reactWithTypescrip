@@ -1,35 +1,105 @@
-"use client";
+// FormSubmitComponent.js
+import React, { useEffect, useState } from "react";
+import { Label, TextInput, Textarea } from "flowbite-react";
 
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
+type ErrorType = {
+  price: string;
+  title: string;
+};
 
-function FormSubmitComponent() {
+function FormSubmitComponent({ getDataForm }: any) {
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState(0);
+  const [description, setDescription] = useState("");
+  const [error, setError] = useState<ErrorType>({
+    price: "",
+    title: "",
+  });
+  const [category, setCategory] = useState("tools");
+  const [image, setImage] = useState("./public/vite.svg");
+
+  const validateForm = () => {
+    let isValid = true;
+
+    if (title.length < 3) {
+      setError((prev) => ({
+        ...prev,
+        title: "Title must be at least 3 characters long",
+      }));
+      isValid = false;
+    } else {
+      setError((prev) => ({
+        ...prev,
+        title: "",
+      }));
+    }
+
+    if (price < 1) {
+      setError((prev) => ({
+        ...prev,
+        price: "Price must be at least $1",
+      }));
+      isValid = false;
+    } else {
+      setError((prev) => ({
+        ...prev,
+        price: "",
+      }));
+    }
+
+    return isValid;
+  };
+
+  useEffect(() => {
+    if (validateForm()) {
+      getDataForm({ title, price, description, category, image });
+    }
+  }, [title, price, description, category, image]);
+
   return (
     <form className="flex max-w-md flex-col gap-4 justify-center">
       <div>
         <div className="mb-2 block">
-          <Label htmlFor="email2" value="Your email" />
+          <Label htmlFor="title" value="Title" />
         </div>
         <TextInput
-          id="email2"
-          type="email"
-          placeholder="name@flowbite.com"
+          id="title"
+          type="text"
+          placeholder="Enter your product title"
           required
           shadow
+          onChange={(e) => setTitle(e.target.value)}
         />
+        {error.title && <p className="text-red-500">{error.title}</p>}
       </div>
       <div>
         <div className="mb-2 block">
-          <Label htmlFor="password2" value="Your password" />
+          <Label htmlFor="price" value="Price" />
         </div>
-        <TextInput id="password2" type="password" required shadow />
+        <TextInput
+          id="price"
+          type="number"
+          placeholder="Enter your product price"
+          required
+          shadow
+          onChange={(e) => setPrice(parseFloat(e.target.value))}
+        />
+        {error.price && <p className="text-red-500">{error.price}</p>}
       </div>
       <div>
         <div className="mb-2 block">
-          <Label htmlFor="repeat-password" value="Repeat password" />
+          <Label htmlFor="description" value="Description" />
         </div>
-        <TextInput id="repeat-password" type="password" required shadow />
+        <Textarea
+          id="description"
+          placeholder="Enter your product description"
+          required
+          shadow
+          onChange={(e) => setDescription(e.target.value)}
+        />
       </div>
     </form>
   );
 }
+
 export default FormSubmitComponent;

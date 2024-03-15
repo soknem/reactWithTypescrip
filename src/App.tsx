@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "flowbite-react";
-import { Modal } from "flowbite-react";
+import { Modal, Spinner } from "flowbite-react";
 import { Card } from "flowbite-react";
 import CardComponent from "./Components/CardComponent";
 import NavbarComponent from "./Components/NavbarComponent";
@@ -19,7 +19,6 @@ type Products = {
 };
 
 export default function App() {
-  const [count, setCount] = useState(0);
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState<Status>("idle");
   const [dataForm, setDataForm] = useState({});
@@ -28,9 +27,9 @@ export default function App() {
   const handleButtonClick = () => {
     setIsFormOpen(true);
   };
-  function getDataForm(product: any) {
+  const getDataForm = (product: any) => {
     setDataForm(product);
-  }
+  };
 
   useEffect(() => {
     setStatus("loading");
@@ -44,10 +43,21 @@ export default function App() {
         setStatus("error");
       });
   }, []);
+  const createProduct = async () => {
+    fetch("https://fakestoreapi.com/products", {
+      method: "POST",
+      body: JSON.stringify(dataForm),
+      headers: {
+        "Content-type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => console.log(json));
+  };
   if (status === "loading")
     return (
       <h1 className="h-screen grid place-content-center text-6xl">
-        {/* <Spinner aria-label="Default status example" /> */}
+        {<Spinner aria-label="Default status example" />}
       </h1>
     );
   return (
@@ -84,7 +94,12 @@ export default function App() {
           >
             Cancel
           </Button>
-          <Button className="w-1/2" onClick={() => {}}>
+          <Button
+            className="w-1/2"
+            onClick={() => {
+              createProduct();
+            }}
+          >
             Create
           </Button>
         </Modal.Footer>
